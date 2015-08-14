@@ -25,12 +25,12 @@ void get_racetrack_params(
 void get_start_pos( int *start_x, int *start_y );
 
 // Implement game
-bool inside_ellipse( int x, int y, int x0, int y0, int xr, int yr, double p )
+bool inside_ellipse( double x, double y, double x0, double y0, double xr, double yr, double p )
 {
-	x = ((x - x0)/xr);
-	y = ((y - y0)/yr);
+	double x1 = ((x - x0)/xr);
+	double y1 = ((y - y0)/yr);
 	
-	double inEllipse = p_norm( x, y, p );
+	double inEllipse = p_norm( x1, y1, p );
 	
 	if ( inEllipse <= 1 )
 	{
@@ -113,51 +113,60 @@ void zombie_racer( int start_x, int start_y )
 	while ( key != 'q' && key >= 0 && alive )
 	{
 		// Change direction
-		switch ( key )
+		if ( key == '1' )
 		{
-			case 1:
-				dir = dir - 45;
-				if ( dir == -45 )
-				{
-					dir = 315;
-				}
-			case 3:
-				dir = dir + 45;
-				if ( dir == 360 )
-				{
-					dir = 0;
-				}
-			default:
-				dir = dir;
+			dir = dir - 45;
+			if ( dir == -45 )
+			{
+				dir = 315;
+			}
+		}
+		else if ( key == '3' )
+		{
+			dir = dir + 45;
+			if ( dir == 360 )
+			{
+				dir = 0;
+			}
 		}
 
 		// Take on step forward in the current direction
-		switch (dir)
+		if ( dir == 0 )
 		{
-			case 0:
-				x = x - 1;
-			case 45:
-				x = x - 1;
-				y = y + 1;
-			case 90:
-				y = y + 1;
-			case 135:
-				x = x + 1;
-				y = y + 1;
-			case 180:
-				x = x + 1;
-			case 225:
-				x = x + 1;
-				y = y - 1;
-			case 270:
-				y = y - 1;
-			case 315:
-				x = x - 1;
-				y = y - 1;
-			default:
-				x = x;
-				y = y;
-		}		
+			y = y - 1;
+		}
+		else if ( dir == 45 )
+		{
+			x = x + 1;
+			y = y - 1;
+		}
+		else if ( dir == 90 )
+		{
+			x = x + 1;
+		}
+		else if ( dir == 135 )
+		{
+			x = x + 1;
+			y = y + 1;
+		}
+		else if ( dir == 180 )
+		{
+			y = y + 1;
+		}
+		else if ( dir == 225 )
+		{
+			x = x - 1;
+			y = y + 1;
+		}
+		else if ( dir == 270 )
+		{
+			x = x - 1;
+		}
+		else if ( dir == 315 )
+		{
+			x = x - 1;
+			y = y - 1;
+		}	
 
 		alive = on_racetrack( x, y );
 		update_view( x, y, alive );
