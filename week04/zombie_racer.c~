@@ -30,7 +30,7 @@ bool inside_ellipse( int x, int y, int x0, int y0, int xr, int yr, double p )
 	x = ((x - x0)/xr);
 	y = ((y - y0)/yr);
 	
-	double inEllipse = p_norm( x, y, p );
+	int inEllipse = p_norm( x, y, p );
 	
 	if ( inEllipse <= 1 )
 	{
@@ -44,59 +44,18 @@ bool inside_ellipse( int x, int y, int x0, int y0, int xr, int yr, double p )
 
 bool on_racetrack( int x, int y )
 {
-	int x0, xr_outer, xr_inner;
-	int y0, yr_outer, yr_inner;
-	double p;
-	
-	get_racetrack_params( &x0, &xr_outer, &xr_inner, &y0, &yr_outer, &yr_inner, &p );
-
-	bool inSmallEllipse = inside_ellipse( x, y, x0, y0, xr_inner, yr_inner, p );
-	bool inBigEllipse = inside_ellipse( x, y, x0, y0, xr_outer, yr_outer, p );
-	
-	if ( !inSmallEllipse && inBigEllipse )
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return false;
 }
 
 void draw_racetrack()
 {
-	bool raceTrack = false;
-	for ( int i = 0; i <= screen_width(); i++ )
-	{
-		for (int j = 0; j <= screen_height(); j++ )
-		{
-			raceTrack = on_racetrack( i, j );
-			if ( !raceTrack )
-			{
-				draw_char( i, j, '^' );
-			}
-		}
-	}
 }
 
 void draw_zombie( int x, int y, bool zombie_alive )
 {
-	if ( zombie_alive )
-	{
-		draw_char( x, y, 'Z' );
-	}
-	else
-	{
-		draw_char( x, y, 'X' );
-	}
 }
-
 void update_view( int zombie_x, int zombie_y, bool zombie_alive )
 {
-	clear_screen( );
-	draw_racetrack( );
-	draw_zombie( zombie_x, zombie_y, zombie_alive );
-	show_screen( );
 }
 
 void zombie_racer( int start_x, int start_y )
@@ -113,7 +72,7 @@ void zombie_racer( int start_x, int start_y )
 	while ( key != 'q' && key >= 0 && alive )
 	{
 		// Change direction
-		switch ( key )
+		switch (key)
 		{
 			case 1:
 				dir = dir - 45;
@@ -190,7 +149,7 @@ void get_start_pos( int *start_x, int *start_y )
 	// Get the geometry of the race track
 	int x0, y0, xr_outer, yr_outer, xr_inner, yr_inner;
 	double p;
-	get_racetrack_params( &x0, &xr_outer, &xr_inner, &y0, &yr_outer, &yr_inner, &p );
+	get_racetrack_params( &x0, &xr_outer, &xr_inner, &y0, &yr_outer, &yr_inner, 		&p );
 
 	// Start at the left, close to the middle of the track
 	*start_x = x0 - xr_outer + ( xr_outer - xr_inner ) / 2;
