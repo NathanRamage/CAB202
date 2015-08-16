@@ -1,0 +1,34 @@
+#ifndef _ALIEN_H_
+#define _ALIEN_H_
+
+/* Standard libraries */
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <slack/std.h>
+#ifndef HAVE_SNPRINTF
+#include <slack/snprintf.h>
+
+/* External libraries */
+#include "cab202_graphics.h"
+#include "cab202_timers.h"
+
+struct Aliens
+{
+	int x;
+	int y;
+	bool alive;
+	char body;
+};
+
+void declare_aliens( int dx );
+
+void draw_alien( struct Aliens *alien );
+
+void spawn_aliens( 
+	struct Aliens *alien1, struct Aliens *alien2, struct Aliens *alien3, struct Aliens *alien4, struct Aliens *alien5,
+	struct Aliens *alien6, struct Aliens *alien7, struct Aliens *alien8, struct Aliens *alien9, struct Aliens *alien10, int dx );
+
+void move_aliens();
+
+#endif
