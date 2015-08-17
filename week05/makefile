@@ -1,0 +1,19 @@
+all: simple_timer sprites zombie_wrap
+
+LIBS=-lzdk04 -lncurses -lm -lrt
+DIRS=-I../Topic04/ZDK04 -L../Topic04/ZDK04
+FLAGS=-std=gnu99 -D_XOPEN_SOURCE=500 -Wall -Werror
+
+clean: 
+	rm *.exe
+
+rebuild: cleanall
+
+simple_timer: simple_timer.c ../Topic04/ZDK04/libzdk04.a
+	gcc $(FLAGS) $@.c -o $@ $(DIRS) $(LIBS)
+
+sprites: sprites.c ../Topic04/ZDK04/libzdk04.a
+	gcc $(FLAGS) $@.c -o $@ $(DIRS) $(LIBS)
+
+zombie_wrap: zombie_wrap.c ../Topic04/ZDK04/libzdk04.a
+	gcc $(FLAGS) $@.c -o $@ $(DIRS) $(LIBS)

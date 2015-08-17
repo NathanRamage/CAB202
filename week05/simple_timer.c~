@@ -1,0 +1,74 @@
+/* standard includes */
+#include <stdbool.h>
+#include <stdlib.h>
+
+/* external libraries */
+#include <cab202_graphics.h>
+#include <cab202_timers.h>
+
+// stucture to hold game data
+typedef struct Game
+{
+	timer_id timer;
+	int score;
+	bool over;
+} Game;
+
+void setup_score(  Game * game )
+{
+	game->score = 0;
+	game->over = false;
+	game->timer = create_timer( 1000 );
+	
+}
+
+bool update_score( Game * game )
+{
+	int expired = timer_expired( game->timer );
+	if ( !expired )
+	{
+		return false;
+	}
+	else
+	{
+		game->score += 1;
+		if ( game->score == 39 )
+		{
+			game->over = true;
+		}
+		return true;
+	}
+}
+
+void display_score( Game  * game )
+{
+	double current_time = get_current_time();
+	draw_formatted( 30, 2, "Score: %d", game->score );
+	draw_formatted( 30, 3, "Clock time: %.6f", current_time );
+}
+
+// don't include below when submitting
+void simple_timer( void )
+{
+	Game game;
+	setup_score( &game );
+	while ( !game.over )
+	{
+		if ( update_score( &game ) )
+		{
+			clear_screen();
+			display_score( &game );
+			show_screen();
+		}
+		timer_pause( 100 );
+	}
+	timer_pause( 1500 );
+}
+
+int main( void )
+{
+	setup_screen();
+	simple_timer();
+	cleanup_screen();
+	return 0;
+}
