@@ -7,10 +7,29 @@
 
 /* External libraries */
 #include "cab202_graphics.h"
+#include "cab202_timers.h"
+#include "player.h"
+#include "alien.h"
 
 /* Definitions */
 #define String char*
+#define TURN_READY (5)
+#define TURN_GAME_OVER (0)
+#define TURN_SCREEN_CHANGED (1)
 
-void draw_level( int level, int lives, int score );
+typedef struct Game
+{
+	int score;
+	int lives;
+	int level;
+} Game;
+
+void setup_level( Game * game );
+
+int play_turn( void );
+
+void draw_game( Alien * alien, Game * game );
+
+void draw_level( Game * game );
 
 #endif

@@ -5,27 +5,45 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include <time.h>
 
 /* External libraries */
 #include "cab202_graphics.h"
 #include "cab202_timers.h"
+#include "cab202_sprites.h"
 
-struct Aliens
+/* definitions */
+#define NUM_ALIENS (10)
+#define MAX_NUM_BOMBS (4)
+#define ALIEN_UPDATE_TIME (100)
+#define BOMB_UPDATE_TIME (3000)
+
+//sprite_id aliens[NUM_ALIENS];
+
+typedef struct Alien
 {
-	int x;
-	int y;
-	bool alive;
-	char body;
-};
+	timer_id alien_timer;
+	sprite_id sprite[NUM_ALIENS];
+	bool alive[NUM_ALIENS];
+	char* body;
+	int numBombs;
+	sprite_id bombs[MAX_NUM_BOMBS];
+	timer_id bomb_timer;
+	bool last_bomb[NUM_ALIENS];
+	int active_bombs;
+} Alien;
 
-void declare_aliens( int dx );
+void setup_aliens( Alien * alien );
 
-void draw_alien( struct Aliens *alien );
+void draw_aliens( Alien * alien );
 
-void spawn_aliens( 
-	struct Aliens *alien1, struct Aliens *alien2, struct Aliens *alien3, struct Aliens *alien4, struct Aliens *alien5,
-	struct Aliens *alien6, struct Aliens *alien7, struct Aliens *alien8, struct Aliens *alien9, struct Aliens *alien10, int dx );
+bool update_aliens( Alien * alien );
 
-void move_aliens();
+void update_bombs( Alien * alien );
+
+void create_bomb( int bomb_num, Alien * alien );
+
+void draw_bombs( Alien * alien );
 
 #endif

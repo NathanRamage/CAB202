@@ -4,17 +4,27 @@
 
 int main( void )
 {
-	int key = 'r';
-	while ( key == 'r' )
+	Game game;
+	Alien alien;
+	
+	srand( time ( NULL ) );
+
+	setup_screen();
+	setup_level( &game );
+	setup_player();
+	setup_aliens( &alien );
+	show_screen();
+
+	int turn_result = TURN_READY;
+	while ( turn_result != TURN_GAME_OVER )
 	{
-		setup_screen();
-		draw_player( screen_width() / 2 );
-		draw_level( 1, 3, 0 );
-		declare_aliens( 0 );
-		show_screen();
-		key = move_player( key );
+		turn_result = play_turn( &alien );
+		if ( turn_result == TURN_SCREEN_CHANGED )
+		{
+			draw_game( &alien, &game );
+		}
+		timer_pause( 5 );
 	}
 	cleanup_screen();
-	
 	return 0;
 }

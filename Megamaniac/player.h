@@ -7,13 +7,16 @@
 /* External libraries */
 #include "cab202_graphics.h"
 #include "cab202_timers.h"
+#include "cab202_sprites.h"
 #include "game.h"
-#include "alien.h"
 
-void draw_player (int x );
+/* script wide variables */
+sprite_id player;
 
-int move_player ( int key );
+void draw_player( sprite_id player );
 
-void update_view( int x );
+void setup_player( void );
+
+bool update_player( int key );
 
 #endif

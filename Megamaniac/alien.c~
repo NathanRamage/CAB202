@@ -1,121 +1,163 @@
 /* External libraries */
 #include "alien.h"
 
-/* draw alien */
-void draw_alien( struct Aliens *alien )
+void draw_aliens( Alien * alien )
 {
-	/* draw aliens */
-	draw_char( alien->x, alien->y, alien->body );
-}
-
-/* move aliens one step to the left after 0.5 sec */
-void move_aliens()
-{
-	declare_aliens( 1 );
-}
-
-/* declare aliens */
-void declare_aliens( int dx )
-{
-	struct Aliens alien1, alien2, alien3, alien4, alien5, alien6, alien7, alien8, alien9, alien10;
-	
-	spawn_aliens( &alien1, &alien2, &alien3, &alien4, &alien5, &alien6, &alien7, &alien8, &alien9, &alien10, dx );
-}
-
-void spawn_aliens( 
-	struct Aliens *alien1, struct Aliens *alien2, struct Aliens *alien3, struct Aliens *alien4, struct Aliens *alien5,
-	struct Aliens *alien6, struct Aliens *alien7, struct Aliens *alien8, struct Aliens *alien9, struct Aliens *alien10,
-	int dx )
-{
-
-	if ( dx == 0 )
-	{	
-		/* alien 1 specification */
-		alien1->x = 3;
-		alien1->y = 1;
-		alien1->alive = true;
-		alien1->body = '@';
-
-		/* alien 2 specification */
-		alien2->x = 9;
-		alien2->y = 1;
-		alien2->alive = true;
-		alien2->body = '@';
-
-		/* alien 3 specification */
-		alien3->x = 15;
-		alien3->y = 1;
-		alien3->alive = true;
-		alien3->body = '@';
-
-		/* alien 4 specification */
-		alien4->x = 0;
-		alien4->y = 3;
-		alien4->alive = true;
-		alien4->body = '@';
-	
-		/* alien 5 specification */
-		alien5->x = 6;
-		alien5->y = 3;
-		alien5->alive = true;
-		alien5->body = '@';
-
-		/* alien 6 specification */
-		alien6->x = 12;
-		alien6->y = 3;
-		alien6->alive = true;
-		alien6->body = '@';
-
-		/* alien 7 specification */
-		alien7->x = 18;
-		alien7->y = 3;
-		alien7->alive = true;
-		alien7->body = '@';
-
-		/* alien 8 specification */
-		alien8->x = 3;
-		alien8->y = 5;
-		alien8->alive = true;
-		alien8->body = '@';
-
-		/* alien 9 specification */
-		alien9->x = 9;
-		alien9->y = 5;
-		alien9->alive = true;
-		alien9->body = '@';
-
-		/* alien 10 specification */
-		alien10->x = 15;
-		alien10->y = 5;
-		alien10->alive = true;
-		alien10->body = '@';
+	for ( int i = 0; i < NUM_ALIENS; i++ )
+	{
+		draw_sprite( alien->sprite[i] );
 	}
-	/* increment every aliens positon by dx */
+}
+
+void draw_bombs( Alien * alien )
+{
+	for (int i = 0; i < MAX_NUM_BOMBS; i++ )
+	{
+		if ( alien->bombs[i]->is_visible == 't' )
+		{
+			draw_sprite( alien->bombs[i] );
+		}
+	}
+}
+
+void setup_aliens( Alien * alien )
+{
+	alien->numBombs = 0;
+	alien->bomb_timer = create_timer( BOMB_UPDATE_TIME );
+	alien->alien_timer = create_timer( ALIEN_UPDATE_TIME );
+	alien->body = "@";
+
+	for( int i = 0; i < NUM_ALIENS; i++ )
+	{
+		alien->alive[i] = true;
+		alien->last_bomb[i] = false;
+	}
+
+	for( int i = 0; i < MAX_NUM_BOMBS; i++ )
+	{
+		alien->bombs[i] = create_sprite( 0, 0, 1,  1, "." );
+		alien->bombs[i]->is_visible = false;
+	}
+
+	alien->sprite[0] = create_sprite( 3, 1, 1, 1, alien->body );
+	alien->sprite[1] = create_sprite( 9, 1, 1, 1, alien->body );
+	alien->sprite[2] = create_sprite( 15, 1, 1, 1, alien->body );
+	alien->sprite[3] = create_sprite( 0, 3, 1, 1, alien->body );
+	alien->sprite[4] = create_sprite( 6, 3, 1, 1, alien->body );
+	alien->sprite[5] = create_sprite( 12, 3, 1, 1, alien->body );
+	alien->sprite[6] = create_sprite( 18, 3, 1, 1, alien->body );
+	alien->sprite[7] = create_sprite( 3, 5, 1, 1, alien->body );
+	alien->sprite[8] = create_sprite( 9, 5, 1, 1, alien->body );
+	alien->sprite[9] = create_sprite( 15, 5, 1, 1, alien->body );
+
+	for ( int i = 0; i < NUM_ALIENS; i++ )
+	{
+		alien->sprite[i]->dx = 0.2;
+	}
+	
+	draw_aliens( alien );
+}
+
+void create_bomb( int bomb_num, Alien * alien )
+{
+	int chosen_one;
+	
+	do
+	{
+		chosen_one = rand() % ( NUM_ALIENS );
+	} while ( alien->last_bomb[chosen_one] );
+	
+	for ( int i = 0; i < chosen_one; i++ )
+	{
+		if ( alien->last_bomb[i] )
+		{
+			alien->last_bomb[i] = false;
+		}
+	}
+
+	for ( int the_one = chosen_one; the_one < NUM_ALIENS; ++the_one )
+	{
+		if ( alien->last_bomb[the_one] )
+		{
+			alien->last_bomb[the_one] = false;
+		}
+	}
+
+	alien->bombs[bomb_num]->is_visible = 't';
+	alien->bombs[bomb_num]->x = alien->sprite[chosen_one]->x;
+	alien->bombs[bomb_num]->y = alien->sprite[chosen_one]->y;
+	alien->bombs[bomb_num]->dy = 0.5;
+	alien->last_bomb[chosen_one] = true;
+}
+
+void update_bombs ( Alien * alien )
+{
+	alien->active_bombs = 1;
+	for ( int i = 0; i < MAX_NUM_BOMBS; i++ )
+	{
+		if (  alien->bombs[i]->is_visible == 't' )
+		{
+			alien->active_bombs++;
+		}
+	}
+
+	if ( alien->numBombs < MAX_NUM_BOMBS && alien->numBombs < alien->active_bombs )
+	{
+		alien->numBombs++;
+	}
+
+	for ( int i = 0; i < alien->numBombs; i++ )
+	{
+		if ( !alien->bombs[i]->is_visible )
+		{
+			create_bomb( i, alien );
+		}
+	}
+}
+
+bool update_aliens(	Alien * alien )
+{
+	if ( !timer_expired( alien->alien_timer )  )
+	{
+		return false;
+	}
+	else if ( timer_expired( alien->bomb_timer ) )
+	{
+		update_bombs ( alien );
+		return true;
+	}
 	else
 	{
-		alien1->x += dx;
-		int num = alien1->x;
-		++alien2->x;
-		++alien3->x;
-		++alien4->x;
-		++alien5->x;
-		++alien6->x;
-		++alien7->x;
-		++alien8->x;
-		++alien9->x;
-		++alien10->x;
-		printf( "alien x %d", num );
-	}
+		int width = screen_width();	
 
-	/* draw aliens */
-	draw_alien( alien1 );
-	draw_alien( alien2 );
-	draw_alien( alien3 );
-	draw_alien( alien4 );
-	draw_alien( alien5 );
-	draw_alien( alien6 );
-	draw_alien( alien7 );
-	draw_alien( alien8 );
-	draw_alien( alien9 );
-	draw_alien( alien10 );
+		for ( int i = 0; i < NUM_ALIENS; i++ )
+		{
+			int new_x = (int) round( alien->sprite[i]->x + alien->sprite[i]->dx );
+
+			if ( new_x >= width )
+			{
+				alien->sprite[i]->x = 0;
+			}
+
+			alien->sprite[i]->x += alien->sprite[i]->dx;
+		}
+		for ( int i = 0; i < MAX_NUM_BOMBS; i++ )
+		{
+			if ( alien->bombs[i]->is_visible == 't' )
+			{
+				int new_y = (int) round( alien->bombs[i]->y + alien->bombs[i]->dy );
+				if ( new_y >= screen_height() - 3 )
+				{
+					alien->bombs[i]->is_visible = false;
+					alien->bombs[i]->x = 0;
+					alien->bombs[i]->y = 0;
+				}
+				else
+				{
+					alien->bombs[i]->y += alien->bombs[i]->dy;
+				}
+			}
+		}
+		return true;
+	}
 }

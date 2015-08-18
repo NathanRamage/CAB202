@@ -1,54 +1,39 @@
 /* External libraries */
 #include "player.h"
 
-/* Declare variables */
-int score = 0;
-int lives = 3;
-int level = 1;
-
-void draw_player( int x )
+void draw_player( sprite_id player )
 {
-	draw_char( x, screen_height() - 4, '$' );
+	draw_sprite( player );
 }
 
-int move_player ( int key )
+void setup_player( void )
 {
-	int x = screen_width() / 2;
-	key = wait_char();
+	int left = ( screen_width() / 2 );
+	int top = ( screen_height() - 4 );
 
-	while ( key != 'q' && key != 'r' && key >= 0 )
+	player = create_sprite( left, top, 1, 1, "$" );
+
+	draw_player( player );
+}
+
+bool update_player( int key )
+{
+	bool player_moved = true;
+
+	int width, height;
+	get_screen_size( width, height );
+	
+	if ( key == 'd' && player->x < width - 1 )
 	{
-		if ( key == 'a' )
-		{
-			x = x - 1;
-		}
-		else if ( key == 'd' )
-		{
-			x = x + 1;
-		}
-
-
-		if ( x >= 79 )
-		{
-			x = 79;
-		}
-		else if ( x <= 0 )
-		{
-			x = 0;
-		}
-		update_view( x );
-		timer_pause( 100 );
-		key = wait_char();
+		player->x++;
 	}
-
-	return key;
-}
-
-void update_view( int x )
-{
-	clear_screen();
-	draw_level( level, lives, score );
-	draw_player( x );
-	move_aliens( 1 );
-	show_screen();
+	else if ( key == 'a' && player->x > 0 )
+	{
+		player->x--;
+	}
+	else
+	{
+		player_moved = false;
+	}
+	return player_moved;
 }
