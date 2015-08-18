@@ -37,3 +37,8 @@ bool update_player( int key )
 	}
 	return player_moved;
 }
+
+void cleanup_player( void )
+{
+	free( player );
+}

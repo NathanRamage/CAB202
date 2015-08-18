@@ -55,7 +55,18 @@ void draw_game( Alien * alien, Game * game )
 	show_screen();
 }
 
-int play_turn( Alien * alien )
+void cleanup_game( Alien * alien, Game * game )
+{
+	//cleanup_player();
+	//cleanup_aliens( alien );
+
+	setup_level( game );
+	setup_player();
+	setup_aliens( alien );
+	show_screen();
+}
+
+int play_turn( Alien * alien, Game * game )
 {
 	int result = TURN_READY;
 	int key = get_char();
@@ -66,6 +77,7 @@ int play_turn( Alien * alien )
 	}
 	else if ( key == 'r' || key == 'R' )
 	{
+		cleanup_game( alien, game );
 		result = TURN_READY;
 	}
 

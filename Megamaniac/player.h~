@@ -13,7 +13,7 @@
 /* script wide variables */
 sprite_id player;
 
-void draw_player( sprite_id * player );
+void draw_player( sprite_id player );
 
 void setup_player( void );
 

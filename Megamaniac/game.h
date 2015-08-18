@@ -26,10 +26,12 @@ typedef struct Game
 
 void setup_level( Game * game );
 
-int play_turn( Alien * alien );
+int play_turn( Alien * alien, Game * game );
 
 void draw_game( Alien * alien, Game * game );
 
 void draw_level( Game * game );
+
+void cleanup_game ( Alien * alien, Game * game );
 
 #endif

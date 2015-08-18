@@ -32,19 +32,20 @@ typedef struct Alien
 	timer_id bomb_timer;
 	bool last_bomb[NUM_ALIENS];
 	int active_bombs;
-	bool bomb_time;
 } Alien;
 
 void setup_aliens( Alien * alien );
 
 void draw_aliens( Alien * alien );
 
-bool update_aliens( Alien * alien );
+bool update_aliens( Game * game, Alien * alien );
 
 void update_bombs( Alien * alien );
 
 void create_bomb( int bomb_num, Alien * alien );
 
 void draw_bombs( Alien * alien );
+
+void cleanup_aliens( Alien * alien );
 
 #endif

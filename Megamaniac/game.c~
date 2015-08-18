@@ -48,14 +48,25 @@ void draw_game( Alien * alien, Game * game )
 	draw_aliens( alien );
 	draw_player( player );
 	draw_level( game );
-	for ( int i = 0; i < NUM_ALIENS; i++ )
+	/*for ( int i = 0; i < NUM_ALIENS; i++ )
 	{
 		draw_formatted( 0, 6 + i, "Alien %d last_bomb = %d", i + 1, alien->last_bomb[i] );
-	}
+	}*/
 	show_screen();
 }
 
-int play_turn( Alien * alien )
+void cleanup_game( Alien * alien, Game * game )
+{
+	//cleanup_player();
+	//cleanup_aliens( alien );
+
+	setup_level( game );
+	setup_player();
+	setup_aliens( alien );
+	show_screen();
+}
+
+int play_turn( Alien * alien, Game * game )
 {
 	int result = TURN_READY;
 	int key = get_char();
@@ -66,6 +77,7 @@ int play_turn( Alien * alien )
 	}
 	else if ( key == 'r' || key == 'R' )
 	{
+		cleanup_game( alien, game );
 		result = TURN_READY;
 	}
 
@@ -73,7 +85,7 @@ int play_turn( Alien * alien )
 	{
 		result = TURN_SCREEN_CHANGED;
 	}
-	else if ( update_aliens( alien ) )
+	else if ( update_aliens( game ) )
 	{
 		result = TURN_SCREEN_CHANGED;
 	}

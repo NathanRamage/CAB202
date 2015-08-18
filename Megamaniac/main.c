@@ -18,7 +18,7 @@ int main( void )
 	int turn_result = TURN_READY;
 	while ( turn_result != TURN_GAME_OVER )
 	{
-		turn_result = play_turn( &alien );
+		turn_result = play_turn( &alien, &game );
 		if ( turn_result == TURN_SCREEN_CHANGED )
 		{
 			draw_game( &alien, &game );

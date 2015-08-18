@@ -19,4 +19,6 @@ void setup_player( void );
 
 bool update_player( int key );
 
+void cleanup_player( void );
+
 #endif

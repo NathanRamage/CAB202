@@ -46,4 +46,6 @@ void create_bomb( int bomb_num, Alien * alien );
 
 void draw_bombs( Alien * alien );
 
+void cleanup_aliens( Alien * alien );
+
 #endif

@@ -1,6 +1,13 @@
 /* External libraries */
 #include "alien.h"
 
+void cleanup_aliens( Alien * alien )
+{
+	free( alien->sprite[NUM_ALIENS] );
+	free( alien->bomb_timer );
+	free( alien->alien_timer );
+}
+
 void draw_aliens( Alien * alien )
 {
 	for ( int i = 0; i < NUM_ALIENS; i++ )
@@ -106,16 +113,23 @@ void update_bombs ( Alien * alien )
 		alien->numBombs++;
 	}
 
+	int j = 0;
+
 	for ( int i = 0; i < alien->numBombs; i++ )
 	{
 		if ( !alien->bombs[i]->is_visible )
 		{
+			if ( j >= 1 )
+			{
+				break;
+			}
 			create_bomb( i, alien );
+			j++;
 		}
 	}
 }
 
-bool update_aliens(	Alien * alien )
+bool update_aliens( Alien * alien )
 {
 	if ( !timer_expired( alien->alien_timer )  )
 	{

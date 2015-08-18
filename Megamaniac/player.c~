@@ -3,14 +3,6 @@
 
 void draw_player( sprite_id player )
 {
-	if ( !player->is_visible )
-	{
-		player->is_visible = 't';
-	}
-	else
-	{
-		player->is_visible = false;
-	}
 	draw_sprite( player );
 }
 
