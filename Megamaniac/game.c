@@ -13,7 +13,7 @@ void setup_level( Game * game )
 	int level2_HUD_height = screen_height() - 2;
 	int level3_HUD_height = screen_height() - 3;
 
-	int score_lives_len = snprintf( NULL, 0, "Score: %d   Lives: %d   ", game->score, game->lives );
+	int score_lives_len = snprintf( NULL, 0, "Score: %d   Lives: %d   ", games->score, game->lives );
 	int level_text_len = snprintf( NULL, 0, "Level: %d - Basic", game->lives ); 
 	int left_score_lives = ( screen_width() / 2 ) + ( score_lives_len - 2 );
 	int left_level = ( screen_width() / 2 ) - ( level_text_len / 2 );
@@ -48,18 +48,11 @@ void draw_game( Alien * alien, Game * game )
 	draw_aliens( alien );
 	draw_player( player );
 	draw_level( game );
-	/*for ( int i = 0; i < NUM_ALIENS; i++ )
-	{
-		draw_formatted( 0, 6 + i, "Alien %d last_bomb = %d", i + 1, alien->last_bomb[i] );
-	}*/
 	show_screen();
 }
 
 void cleanup_game( Alien * alien, Game * game )
 {
-	//cleanup_player();
-	//cleanup_aliens( alien );
-
 	setup_level( game );
 	setup_player();
 	setup_aliens( alien );

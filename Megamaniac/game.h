@@ -7,7 +7,6 @@
 
 /* External libraries */
 #include "cab202_graphics.h"
-#include "cab202_timers.h"
 #include "player.h"
 #include "alien.h"
 
@@ -24,14 +23,20 @@ typedef struct Game
 	int level;
 } Game;
 
+/* sets the default values for properties in Game */
 void setup_level( Game * game );
 
+/* checks which event that can change the screen has occured
+   or the alien timer has expired */
 int play_turn( Alien * alien, Game * game );
 
+/* calls draw_game, draw_level, draw_bombs and draw_aliens */
 void draw_game( Alien * alien, Game * game );
 
+/* draws the level */
 void draw_level( Game * game );
 
+/* calls cleanup_aliens, cleanup_player */
 void cleanup_game ( Alien * alien, Game * game );
 
 #endif
