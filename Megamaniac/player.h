@@ -4,14 +4,22 @@
 /* Standard libraries */
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* External libraries */
 #include "cab202_graphics.h"
 #include "cab202_timers.h"
 #include "cab202_sprites.h"
 
+/* definitions */
+#define string char*
+#define DEATH_BANNER_SIZE (19)
+#define TRUE 't'
+
 /* script wide variables */
 sprite_id player;
+sprite_id bullet;
+bool shot_bullet;
 
 /* draws player */
 void draw_player( sprite_id player );
@@ -24,5 +32,12 @@ bool update_player( int key );
 
 /* frees memory allocated for the player sprite */
 void cleanup_player( void );
+
+/* reset the players position to the middle of the screen */
+void reset_player( void );
+
+int draw_death_banner ( void );
+
+int player_choice( void );
 
 #endif

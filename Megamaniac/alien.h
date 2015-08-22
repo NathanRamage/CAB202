@@ -40,12 +40,6 @@ void setup_aliens( Alien * alien );
 /* draws aliens */
 void draw_aliens( Alien * alien );
 
-/* moves alien's position */
-bool update_aliens( Alien * alien );
-
-/* move the bombs and destory bombs that have hit the ground or player */
-void update_bombs( Alien * alien );
-
 /* creates a new bomb */
 void create_bomb( int bomb_num, Alien * alien );
 

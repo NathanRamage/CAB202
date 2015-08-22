@@ -7,14 +7,18 @@
 
 /* External libraries */
 #include "cab202_graphics.h"
-#include "player.h"
 #include "alien.h"
+#include "player.h"
 
 /* Definitions */
 #define String char*
-#define TURN_READY (5)
+#define TURN_READY (-1)
 #define TURN_GAME_OVER (0)
 #define TURN_SCREEN_CHANGED (1)
+#define GAME_FINISHED (-2)
+#define RESTART (-3)
+#define DEAD_ALIEN (30)
+#define ALL_ALIENS_DEAD (500)
 
 typedef struct Game
 {
@@ -38,5 +42,14 @@ void draw_level( Game * game );
 
 /* calls cleanup_aliens, cleanup_player */
 void cleanup_game ( Alien * alien, Game * game );
+
+/* two cases make this return true, either the alien timer expires or the bomb time expires */
+bool update_sprites( Alien * alien, Game * game );
+
+/* move the bombs and destory bombs that have hit the ground or player */
+void update_bombs( Alien * alien );
+
+/* checks if the player has died */
+bool check_player_died( Game * game );
 
 #endif
