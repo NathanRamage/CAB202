@@ -16,14 +16,43 @@ int main( void )
 	show_screen();
 
 	int turn_result = TURN_READY;
-	while ( turn_result != TURN_GAME_OVER )
+	bool banner_drawn = false;
+	while ( turn_result != GAME_FINISHED )
 	{
-		turn_result = play_turn( &alien );
-		if ( turn_result == TURN_SCREEN_CHANGED )
+		while ( turn_result != TURN_GAME_OVER )
 		{
-			draw_game( &alien, &game );
+			turn_result = play_turn( &alien, &game );
+			if ( turn_result == TURN_SCREEN_CHANGED )
+			{
+				draw_game( &alien, &game );
+			}
+			else if ( turn_result == GAME_FINISHED )
+			{
+				break;
+			}
 		}
-		timer_pause( 5 );
+		
+		if( turn_result == GAME_FINISHED )
+		{
+			break;
+		}
+		else
+		{
+			if( !banner_drawn )
+			{
+				turn_result = draw_death_banner();
+				banner_drawn = true;
+			}
+			else
+			{
+				turn_result = player_choice();
+				if( turn_result == RESTART )
+				{
+					cleanup_game( &alien, &game );
+					turn_result = TURN_READY;
+				}
+			}
+		}
 	}
 	cleanup_screen();
 	return 0;
