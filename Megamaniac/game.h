@@ -52,6 +52,4 @@ void update_bombs( Alien * alien );
 /* checks if the player has died */
 bool check_player_died( Game * game );
 
-bool resize_detected( void );
-
 #endif

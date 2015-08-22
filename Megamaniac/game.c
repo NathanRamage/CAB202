@@ -2,9 +2,6 @@
 
 #define String char*
 
-/* screen width and height to be used through the script */
-int previous_width, previous_height;
-
 /* Draw current level */
 void setup_level( Game * game )
 {
@@ -12,23 +9,18 @@ void setup_level( Game * game )
 	game->score = 0;
 	game->level = 1;
 	
-	get_screen_size( previous_width, previous_height );
-	
 	int level1_HUD_height = screen_height() - 1;
 	int level2_HUD_height = screen_height() - 2;
 	int level3_HUD_height = screen_height() - 3;
 
-	//int score_lives_len = snprintf( NULL, 0, "Score: 0   Lives: %d   ", game->lives );
-	int level_text_len = snprintf( NULL, 0, "Level: %d - Basic", game->lives );
-	int level_len = snprintf( NULL, 0, "Level: %d ", game->level );
-	int left_score_lives = screen_width() - level_len - 11;
+	int score_lives_len = snprintf( NULL, 0, "Score: %d   Lives: %d   ", game->score, game->lives );
+	int level_text_len = snprintf( NULL, 0, "Level: %d - Basic", game->lives ); 
+	int left_score_lives = ( screen_width() / 2 ) + ( score_lives_len - 2 );
 	int left_level = ( screen_width() / 2 ) - ( level_text_len / 2 );
 	
 	draw_formatted( left_level, level1_HUD_height, "Level: %d - Basic", game->level);
 	draw_formatted( 0, level2_HUD_height, "Nathan Ramage (n8802530)");
-	draw_string( left_score_lives, level2_HUD_height, "Score:");
-	draw_int( left_score_lives + 7, level2_HUD_height, game->score );
-	draw_formatted( screen_width() - level_len, level2_HUD_height, "Lives: %d", game->lives );
+	draw_formatted( left_score_lives, level2_HUD_height, "Score: %d   Lives: %d   ", game->score, game->lives );
 	draw_line( 0, level3_HUD_height, screen_width(), level3_HUD_height, '_');
 }
 
@@ -39,10 +31,10 @@ void draw_level( Game * game )
 	int level2_HUD_height = screen_height() - 2;
 	int level3_HUD_height = screen_height() - 3;
 
-	//int score_lives_len = snprintf( NULL, 0, "Score: 0   Lives: %d   ", game->lives );
+	int score_lives_len = snprintf( NULL, 0, "Score: 0   Lives: %d   ", game->lives );
 	int level_text_len = snprintf( NULL, 0, "Level: %d - Basic", game->lives );
 	int level_len = snprintf( NULL, 0, "Level: %d ", game->level );
-	int left_score_lives = screen_width() - level_len - 11;
+	int left_score_lives = ( screen_width() / 2 ) + ( score_lives_len - 2 );
 	int left_level = ( screen_width() / 2 ) - ( level_text_len / 2 );
 	
 	draw_formatted( left_level, level1_HUD_height, "Level: %d - Basic", game->level);
@@ -82,11 +74,7 @@ int play_turn( Alien * alien, Game * game )
 	int result = TURN_READY;
 	int key = get_char();
 
-	if ( resize_detected() )
-	{
-		cleanup_game( alien, game );
-		return result;
-	}
+
 
 	if( check_player_died( game ) )
 	{
@@ -302,15 +290,4 @@ bool check_player_died ( Game * game )
 	{
 		return false;
 	}
-}
-
-/* check if the screen size has chnaged */
-bool resize_detected( void )
-{
-	int new_width = screen_width();
-	int new_height = screen_height();
-
-	bool resize = previous_width != new_width || previous_height != new_height;
-
-	return resize;
 }

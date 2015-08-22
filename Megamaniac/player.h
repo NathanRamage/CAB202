@@ -36,10 +36,8 @@ void cleanup_player( void );
 /* reset the players position to the middle of the screen */
 void reset_player( void );
 
-/* Draws the banner on the game over screen */
 int draw_death_banner ( void );
 
-/* allows the playe to either quit the game or restart the game from the game over screen */
 int player_choice( void );
 
 #endif
