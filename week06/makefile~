@@ -1,0 +1,16 @@
+All: space-invaders
+
+LIBS=-lncurses -lzdk04 -lm -lrt
+DIRS=-I../ZDK04 -L../ZDK04
+FLAGS=-std=gnu99 -D_XOPEN_SOURCE=500 -Wall -Werror
+
+clean:
+	rm space-invaders
+
+rebuild: cleanall
+
+SRC=game.c
+HDR=game.h
+
+space-invaders: $(SRC) $(HDR) ../ZDK04/libzdk04.a
+	gcc $(FLAGS) $(SRC) -o $@ $(DIRS) $(LIBS) 

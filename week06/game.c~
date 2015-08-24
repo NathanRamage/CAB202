@@ -1,0 +1,248 @@
+#include "game.h"
+
+void setup_game( Game * game )
+{
+	game->score = 0;
+	game->over = false;
+	game->event_loop_delay = 10;
+}
+
+void draw_game( Game * game )
+{
+	int top = screen_height() - 2;
+	draw_line( 0, top, screen_width(), top, '-' );
+	draw_formatted( screen_width() - 10, screen_height() - 1, "Score: %d", game->score );
+}
+
+void setup_ship( Game * game )
+{
+	static char bitmap[55] = 
+		"======  _  "
+		"   \\   / \\ "
+		"  ====| o |"
+		"   /   \\_/ "
+		"======     ";
+
+	game->ship = create_sprite( 3, 4, 11, 5, bitmap );
+}
+
+bool update_ship ( Game * game, int key_code )
+{
+	return false;
+}
+
+void draw_ship( Game * game )
+{
+	draw_sprite( game->ship );
+}
+
+void cleanup_ship( Game * game )
+{
+	free( game->ship );
+}
+
+void setup_bullet( Game * game )
+{
+	static char bitmap[1] = { '-' };
+
+	game->bullet = create_sprite( 0, 0, 1, 1, bitmap );
+	game->bullet->is_visible = false;
+	game->bullet_timer = create_timer( 30 );
+}
+
+void launch_bullet( Game * game )
+{
+	if ( game->bullet->is_visible )
+	{
+	}
+	else
+	{
+		game->bullet->x = game->ship->x + game->ship->width;
+		game->bullet->y = game->ship->y + ( game->ship->height / 2 );
+		game->bullet->dx = 1;
+		game->bullet->dy = 0;
+		game->bullet->is_visible = 't';
+
+		reset_timer( game->bullet_timer );
+	}
+}
+
+bool inside_rect( int x, int y, int left, int top, int width, int height )
+{
+	if ( x >= left && x < left + width && y >= top && y < top + height )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool move_bullet( Game * game )
+{
+	return false;
+}
+
+bool update_bullet( Game * game, int key_code )
+{
+	if ( game->bullet->is_visible )
+	{
+		return move_bullet( game );
+	}
+	else if ( key_code == ' ' )
+	{
+		launch_bullet( game );
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void draw_bullet( Game * game )
+{
+	draw_sprite( game->bullet );
+}
+
+void cleanup_bullet( Game * game )
+{
+	free( game->bullet );
+}
+
+void setup_aliens( Game * game, int rock_x[], int rock_y[] )
+{
+	static char bitmap[1] = { '@' };
+
+	for ( int i = 0; i < N_ALIENS; i++ )
+	{
+		game->aliens[i] = create_sprite( rock_x[i], rock_y[i], 1, 1, bitmap );
+		game->aliens[i]->dy = 1;
+	}
+
+	game->alien_timer = create_timer( 350 );
+}
+
+void draw_aliens( Game * game )
+{
+	for ( int i = 0; i < N_ALIENS; i++ )
+	{
+		draw_sprite( game->aliens[i] );
+	}
+}
+
+bool move_aliens( sprite_id alien )
+{
+	return false;
+}
+
+bool update_aliens( Game * game )
+{
+	if ( !timer_expired( game->alien_timer ) )
+	{
+		return false;
+	}
+	
+	bool changed = false;
+	
+	for ( int i = 0; i < N_ALIENS; i++ )
+	{
+		sprite_id alien = game->aliens[i];
+		changed = move_aliens( alien  ) || changed;
+	}
+
+	return changed;
+}
+
+void cleanup_aliens( Game * game )
+{
+	for ( int i = 0; i < N_ALIENS; i++ )
+	{
+		free( game->aliens[i] );
+	}
+}
+
+int rand_between( int first, int last )
+{
+	return first + rand() % ( last - first );
+}
+
+void setup_all( Game * game )
+{
+	int alien_y[N_ALIENS];
+	int alien_x[N_ALIENS];
+	
+	for ( int i = 0; i < N_ALIENS; i++ )
+	{
+		alien_x[i] = rand_between( 30, screen_width() );
+		alien_y[i] = rand_between( 2, screen_height() - 4 );
+	}
+	
+	setup_game( game );
+	setup_ship( game );
+	setup_bullet( game );
+	setup_aliens( game, alien_x, alien_y );
+}
+
+void draw_all( Game * game )
+{
+	clear_screen();
+	draw_game( game );
+	draw_ship( game );
+	draw_bullet( game );
+	draw_aliens( game );
+	show_screen();
+}
+
+void cleanup_all( Game * game )
+{
+	cleanup_ship( game );
+	cleanup_bullet( game );
+	cleanup_aliens( game );
+}
+
+void event_loop( void )
+{
+	Game game;
+	
+	setup_all( &game );
+	draw_all( &game );
+	
+	while ( !game.over )
+	{
+		int key_code = get_char();
+
+		if ( key_code == 'q' )
+		{
+			game.over = true;
+		}
+		else
+		{
+			bool show_ship = update_ship( &game, key_code );
+			bool show_bullet = update_bullet( &game, key_code );
+			bool show_aliens = update_aliens( &game );
+
+			if ( show_ship || show_bullet || show_aliens )
+			{
+				draw_all( &game );
+			}
+
+			if ( game.score == N_ALIENS )
+			{
+				game.over = true;
+			}
+
+			timer_pause( game.event_loop_delay );
+		}
+	}
+}
+
+int main( void )
+{
+	srand(  time( NULL ) );
+	setup_screen();
+	event_loop();
+	cleanup_screen();
+	return 0;
+}
