@@ -19,12 +19,15 @@
 #define RESTART (-3)
 #define DEAD_ALIEN (30)
 #define ALL_ALIENS_DEAD (500)
+#define UP (-4)
+#define DOWN (-5)
 
 typedef struct Game
 {
 	int score;
 	int lives;
 	int level;
+	String level_text[5];
 } Game;
 
 /* sets the default values for properties in Game */
