@@ -57,8 +57,8 @@ void launch_bullet( Game * game )
 	}
 	else
 	{
-		game->bullet->x = (int) game->ship->x + game->ship->width;
-		game->bullet->y = (int) game->ship->y + ( game->ship->height / 2 );
+		game->bullet->x = game->ship->x + game->ship->width;
+		game->bullet->y = game->ship->y + ( game->ship->height / 2 );
 		game->bullet->dx = 1;
 		game->bullet->dy = 0;
 		game->bullet->is_visible = 't';
@@ -81,7 +81,37 @@ bool inside_rect( int x, int y, int left, int top, int width, int height )
 
 bool move_bullet( Game * game )
 {
-	return false;
+	if ( !game->bullet->is_visible || !timer_expired( game->bullet_timer ))
+	{
+		return false;
+	}
+	else
+	{
+		game->bullet->x += game->bullet->dx;
+		int bullet_x = (int) game->bullet->x;
+		int bullet_y = (int) game->bullet->y;
+		int alien_x;
+		int alien_y;
+		
+		if ( bullet_x >= screen_width() )
+		{
+			game->bullet->is_visible = false;
+		}
+
+		for ( int i = 0; i < N_ALIENS; i++ )
+		{
+			alien_x = (int) game->aliens[i]->x;
+			alien_y = (int) game->aliens[i]->y;
+
+			if ( alien_x == bullet_x && alien_y == bullet_y )
+			{
+				game->aliens[i]->is_visible = false;
+				game->bullet->is_visible = false;
+				game->score++;
+			}
+		}
+	return true;
+	}
 }
 
 bool update_bullet( Game * game, int key_code )
