@@ -86,10 +86,44 @@ void cleanup_player( void )
 	free( player );
 }
 
-void reset_player( void )
+void reset_player( int level, int firstAlien, int lastAlien )
 {
-	int left = ( screen_width() / 2 );
-	player->x = left;
+	if ( level == 3 )
+	{
+		bool notSafe = true;
+		int check_x = 20;
+		firstAlien += 5;
+		lastAlien -= 5;
+		while ( notSafe )
+		{
+			if ( firstAlien < check_x - 5 )
+			{
+				int left = check_x - 5;
+				player->x = left;
+				notSafe = false;
+			}
+			else if ( lastAlien > check_x + 5 )
+			{
+				int left = check_x + 5;
+				player->x = left;
+				notSafe = false;
+			}
+			else
+			{
+				check_x += 5;
+				if ( check_x >= screen_width() )
+				{
+					check_x = 0;
+				}
+			}
+		}
+	}
+	else
+	{
+
+		int left = ( screen_width() / 2 );
+		player->x = left;
+	}
 }
 
 int draw_death_banner( void )

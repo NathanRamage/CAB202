@@ -21,6 +21,8 @@
 #define ALL_ALIENS_DEAD (500)
 #define UP (-4)
 #define DOWN (-5)
+#define WAIT_BOTTOM (-6)
+#define WAIT_TOP (-7)
 
 typedef struct Game
 {
@@ -28,6 +30,7 @@ typedef struct Game
 	int lives;
 	int level;
 	String level_text[5];
+	int harmonicMotion;
 } Game;
 
 /* sets the default values for properties in Game */

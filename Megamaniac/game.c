@@ -11,6 +11,7 @@ void setup_level( Game * game )
 	game->lives = 3;
 	game->score = 0;
 	game->level = 1;
+	game->harmonicMotion = DOWN;
 	
 	get_screen_size( previous_width, previous_height );
 
@@ -206,7 +207,7 @@ bool update_sprites( Alien * alien, Game * game )
 	else
 	{
 		int width = screen_width();
-		//int height = screen_height();
+		int height = screen_height() - 3;
 
 		/* move all aliens by dx */
 		for ( int i = 0; i < NUM_ALIENS; i++ )
@@ -248,8 +249,91 @@ bool update_sprites( Alien * alien, Game * game )
 					/* level two movement */
 					else if ( game->level == 2 )
 					{
+						if ( game->harmonicMotion == DOWN )
+						{
+							alien->sprite[i]->x += alien->sprite[i]->dx;
+							alien->sprite[i]->y += alien->sprite[i]->dy;
+							int current_x = (int) round( alien->sprite[i]->x );
+							alien->alien_moved++;
+
+							if ( current_x >= width )
+							{
+								alien->sprite[i]->x = 0;
+							}
+
+							if ( alien->alien_moved == 360 )
+							{
+								game->harmonicMotion = WAIT_BOTTOM;
+								alien->alien_moved = 0;
+							}
+						}
+						else if ( game->harmonicMotion == UP )
+						{
+							alien->sprite[i]->x += alien->sprite[i]->dx;
+							alien->sprite[i]->y -= alien->sprite[i]->dy;
+							int current_x = (int) round( alien->sprite[i]->x );
+							alien->alien_moved++;
+
+							if ( current_x >= width )
+							{
+								alien->sprite[i]->x = 0;
+							}
+
+							if ( alien->alien_moved == 360 )
+							{
+								game->harmonicMotion = WAIT_TOP;								
+								alien->alien_moved = 0;
+							}
+						}
+						else if ( game->harmonicMotion == WAIT_BOTTOM )
+						{
+							alien->sprite[i]->x += alien->sprite[i]->dx;
+							int current_x = (int) round( alien->sprite[i]->x );
+							game->harmonicMotion = UP;
+
+							if ( current_x >= width )
+							{
+								alien->sprite[i]->x = 0;
+							}
+						}
+						else if ( game->harmonicMotion == WAIT_TOP )
+						{
+							alien->sprite[i]->x += alien->sprite[i]->dx;
+							int current_x = (int) round( alien->sprite[i]->x );
+							game->harmonicMotion = DOWN;
+
+							if ( current_x >= width )
+							{
+								alien->sprite[i]->x = 0;
+							}
+						}
 					}
 					/* level three movement */
+					else if ( game->level == 3 )
+					{
+						alien->sprite[i]->x += alien->sprite[i]->dx;
+						alien->sprite[i]->y += alien->sprite[i]->dy;
+						int current_x = (int) round( alien->sprite[i]->x );
+						int current_y = (int) round( alien->sprite[i]->y );
+						int player_x = (int) round( player->x );
+						int player_y = (int) round( player->y );
+						if ( current_x >= width )
+						{
+							alien->sprite[i]->x = 0;
+						}
+
+						if ( current_y >= height )
+						{
+							alien->sprite[i]->y = 0;
+						}
+
+						if ( player_x == current_x && player_y == current_y )
+						{
+							game->lives--;
+							reset_player( game->level, (int) round( alien->sprite[6]->x ), (int) round( alien->sprite[3]->x ) );
+							alien->sprite[i]->is_visible = false;
+						}
+					}
 
 					/* level four movement */
 
@@ -274,7 +358,7 @@ bool update_sprites( Alien * alien, Game * game )
 				else if ( new_y == player->y && current_x == player->x )
 				{
 					game->lives--;
-					reset_player();
+					reset_player( game->level, (int) round( alien->sprite[6]->x ), (int) round( alien->sprite[3]->x ) );
 					for ( int i = 0; i < MAX_NUM_BOMBS; i++ )
 					{
 						alien->bombs[i]->is_visible = false;

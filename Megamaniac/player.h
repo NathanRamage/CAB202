@@ -34,7 +34,7 @@ bool update_player( int key );
 void cleanup_player( void );
 
 /* reset the players position to the middle of the screen */
-void reset_player( void );
+void reset_player( int level, int firstAlien, int lastAlien );
 
 /* Draws the banner on the game over screen */
 int draw_death_banner ( void );
