@@ -55,15 +55,15 @@ bool update_player( int key )
 	
 	/* if a is pressed move left else if a is pressed more right
 	   the player cannot move out of left and right bounds of the screen */
-	if ( key == 'd' && player->x < width - 1 )
+	if ( ( key == 'd' && player->x < width - 1 ) || ( key == 'D' && player->x < width - 1 ) )
 	{
 		player->x++;
 	}
-	else if ( key == 'a' && player->x > 0 )
+	else if ( ( key == 'a' && player->x > 0 ) || ( key == 'A' && player->x > 0 ) )
 	{
 		player->x--;
 	}
-	else if ( key == 's' )
+	else if ( key == 's' || key == 'S')
 	{
 		if ( !shot_bullet )
 		{

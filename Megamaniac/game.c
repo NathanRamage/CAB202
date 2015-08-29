@@ -100,13 +100,17 @@ int play_turn( Alien * alien, Game * game )
 		result = TURN_GAME_OVER;
 	}
 
-	if ( key == 'q' || key == 'Q' )
+	if ( key == 'q' || key == 'Q')
 	{
 		result = GAME_FINISHED;
 	}
 	else if ( key == 'r' || key == 'R' )
 	{
-		cleanup_game( alien, game );
+		cleanup_player();
+		cleanup_aliens( alien );
+		setup_player();
+		setup_aliens( alien );
+		draw_game( alien, game );
 		result = TURN_READY;
 	}
 	else if ( key == 'l' || key == 'L' )
@@ -209,6 +213,39 @@ bool update_sprites( Alien * alien, Game * game )
 		int width = screen_width();
 		int height = screen_height() - 3;
 
+		if ( game->harmonicMotion == WAIT_TOP || game->harmonicMotion == WAIT_BOTTOM )
+		{
+			
+			if ( game->harmonicMotion == WAIT_BOTTOM )
+			{
+				for ( int i = 0; i < NUM_ALIENS; i++ )
+				{
+					alien->sprite[i]->x++;
+					int current_x = (int) round( alien->sprite[i]->x );
+					game->harmonicMotion = UP;
+
+					if ( current_x >= width )
+					{
+						alien->sprite[i]->x = 0;
+					}
+				}
+			}
+			else if ( game->harmonicMotion == WAIT_TOP )
+			{
+				for ( int i = 0; i < NUM_ALIENS; i++ )
+				{
+					alien->sprite[i]->x++;
+					int current_x = (int) round( alien->sprite[i]->x );
+					game->harmonicMotion = DOWN;
+
+					if ( current_x >= width )
+					{
+						alien->sprite[i]->x = 0;
+					}
+				}
+			}
+		}
+
 		/* move all aliens by dx */
 		for ( int i = 0; i < NUM_ALIENS; i++ )
 		{
@@ -261,7 +298,7 @@ bool update_sprites( Alien * alien, Game * game )
 								alien->sprite[i]->x = 0;
 							}
 
-							if ( alien->alien_moved == 360 )
+							if ( alien->alien_moved == 250 )
 							{
 								game->harmonicMotion = WAIT_BOTTOM;
 								alien->alien_moved = 0;
@@ -279,53 +316,20 @@ bool update_sprites( Alien * alien, Game * game )
 								alien->sprite[i]->x = 0;
 							}
 
-							if ( alien->alien_moved == 360 )
+							if ( alien->alien_moved == 250 )
 							{
 								game->harmonicMotion = WAIT_TOP;								
 								alien->alien_moved = 0;
-							}
-						}
-						else if ( game->harmonicMotion == WAIT_BOTTOM )
-						{
-							alien->sprite[i]->x += alien->sprite[i]->dx;
-							int current_x = (int) round( alien->sprite[i]->x );
-							game->harmonicMotion = UP;
-
-							if ( current_x >= width )
-							{
-								alien->sprite[i]->x = 0;
-							}
-						}
-						else if ( game->harmonicMotion == WAIT_TOP )
-						{
-							alien->sprite[i]->x += alien->sprite[i]->dx;
-							int current_x = (int) round( alien->sprite[i]->x );
-							game->harmonicMotion = DOWN;
-
-							if ( current_x >= width )
-							{
-								alien->sprite[i]->x = 0;
 							}
 						}
 					}
 					/* level three movement */
 					else if ( game->level == 3 )
 					{
-						alien->sprite[i]->x += alien->sprite[i]->dx;
-						alien->sprite[i]->y += alien->sprite[i]->dy;
-						int current_x = (int) round( alien->sprite[i]->x );
-						int current_y = (int) round( alien->sprite[i]->y );
+						level3_movement( &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height );
+
 						int player_x = (int) round( player->x );
 						int player_y = (int) round( player->y );
-						if ( current_x >= width )
-						{
-							alien->sprite[i]->x = 0;
-						}
-
-						if ( current_y >= height )
-						{
-							alien->sprite[i]->y = 0;
-						}
 
 						if ( player_x == current_x && player_y == current_y )
 						{
@@ -336,6 +340,30 @@ bool update_sprites( Alien * alien, Game * game )
 					}
 
 					/* level four movement */
+					else if ( game->level == 4 )
+					{
+						/* same basic movement as level 3 */
+						level3_movement( &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height );
+
+						int player_x = (int) round( player->x );
+						int player_y = (int) round( player->y );
+
+						if ( player_x == current_x && player_y == current_y )
+						{
+							game->lives--;
+							reset_player( game->level, (int) round( alien->sprite[6]->x ), (int) round( alien->sprite[3]->x ) );
+							alien->sprite[i]->is_visible = false;
+						}
+
+						switch (i)
+						{
+							case 1:
+								//double lowerBound = alien->sprite[alien->split_aliens[0]] - alien->sprite[alien->split_aliens[3]];
+								//double 
+								//double randPos = 2 + Rand() % ( );
+								break;
+						}
+					}
 
 					/* level five movement */
 				}
@@ -415,4 +443,27 @@ bool resize_detected( void )
 	bool resize = previous_width != new_width || previous_height != new_height;
 
 	return resize;
+}
+
+/* level 3 movement */
+void level3_movement ( double * alien_x, double * alien_y, double * dx, double * dy, int width, int height )
+{
+	int new_x = (int) round( *alien_x + *dx );
+	int new_y = (int) round( *alien_y + *dy );
+	if ( new_x == width )
+	{
+		*alien_x = 0;
+		*alien_y += *dy;
+	}
+
+	if ( new_y == height )
+	{
+		*alien_y = 0;
+		*alien_x += *dx;
+	}
+	else
+	{
+		*alien_x += *dx;
+		*alien_y += *dy;
+	}
 }

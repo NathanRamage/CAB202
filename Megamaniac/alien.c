@@ -74,6 +74,19 @@ void setup_aliens( Alien * alien )
 	alien->sprite[8] = create_sprite( 9, 5, 1, 1, alien->body );
 	alien->sprite[9] = create_sprite( 15, 5, 1, 1, alien->body );
 
+	//set up an order of aliens to loop through for level 4 movement
+	alien->split_aliens[0] = 6;
+	alien->split_aliens[1] = 2;
+	alien->split_aliens[2] = 9;
+	alien->split_aliens[3] = 5;
+	alien->split_aliens[4] = 3;
+	alien->split_aliens[5] = 0;
+	alien->split_aliens[6] = 7;
+	alien->split_aliens[7] = 4;
+	alien->split_aliens[8] = 1;
+	alien->split_aliens[9] = 8;
+	
+
 	/* set how much the aliens will move across the screen */
 	for ( int i = 0; i < NUM_ALIENS; i++ )
 	{

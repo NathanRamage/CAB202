@@ -33,6 +33,7 @@ typedef struct Alien
 	bool last_bomb[NUM_ALIENS];
 	int possible_bombs;
 	int alien_moved;
+	int split_aliens[NUM_ALIENS];
 } Alien;
 
 /* defines deault values for alien struct and draws them in their initial positions */

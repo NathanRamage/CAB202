@@ -4,6 +4,7 @@
 /* Standard libraries */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 /* External libraries */
 #include "cab202_graphics.h"
@@ -59,5 +60,7 @@ void update_bombs( Alien * alien );
 bool check_player_died( Game * game );
 
 bool resize_detected( void );
+
+void level3_movement( double * alien_x, double * alien_y, double * dx, double * dy, int width, int height );
 
 #endif
