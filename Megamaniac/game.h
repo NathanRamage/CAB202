@@ -61,6 +61,10 @@ bool check_player_died( Game * game );
 
 bool resize_detected( void );
 
+/* level 3 movement */
 void level3_movement( double * alien_x, double * alien_y, double * dx, double * dy, int width, int height );
+
+/* level 4 movement */
+void level4_movement ( double * alien_x, double * alien_y, double * dx, double * dy, int width, int height, int infront, int middle, int behind, int alien_num );
 
 #endif

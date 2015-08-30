@@ -45,7 +45,7 @@ void setup_aliens( Alien * alien )
 	alien->numBombs = 0;
 	alien->bomb_timer = create_timer( BOMB_UPDATE_TIME );
 	alien->alien_timer = create_timer( ALIEN_UPDATE_TIME );
-	alien->body = "@";	
+	alien->body = "@";
 	alien->alien_moved = 0;
 
 	/* sets all aliens to be alive and sets that none of the have dropped a bomb */
@@ -62,7 +62,7 @@ void setup_aliens( Alien * alien )
 		alien->bombs[i]->is_visible = false; //make them invisible
 	}
 
-	//set initial positions for teh aliens
+	//set initial positions for the aliens
 	alien->sprite[0] = create_sprite( 3, 1, 1, 1, alien->body );
 	alien->sprite[1] = create_sprite( 9, 1, 1, 1, alien->body );
 	alien->sprite[2] = create_sprite( 15, 1, 1, 1, alien->body );
@@ -85,7 +85,7 @@ void setup_aliens( Alien * alien )
 	alien->split_aliens[7] = 4;
 	alien->split_aliens[8] = 1;
 	alien->split_aliens[9] = 8;
-	
+
 
 	/* set how much the aliens will move across the screen */
 	for ( int i = 0; i < NUM_ALIENS; i++ )
@@ -93,7 +93,7 @@ void setup_aliens( Alien * alien )
 		alien->sprite[i]->dx = 0.2;
 		alien->sprite[i]->dy = 0.2;
 	}
-	
+
 	draw_aliens( alien );
 }
 
@@ -102,7 +102,7 @@ void create_bomb( int bomb_num, Alien * alien )
 {
 	int chosen_one;
 	int dead_aliens = 0;
-	
+
 	for ( int i = 0; i < NUM_ALIENS; i++ )
 	{
 		if ( !alien->alive[i] )
@@ -134,7 +134,7 @@ void create_bomb( int bomb_num, Alien * alien )
 			}
 		}
 	}
-	
+
 	/* search for who dropped the last bomb to rest them so that they can be eligible
 	   to drop the next bomb after the current on has been dropped */
 
@@ -162,8 +162,7 @@ void create_bomb( int bomb_num, Alien * alien )
 	alien->bombs[bomb_num]->is_visible = TRUE;
 	alien->bombs[bomb_num]->x = alien->sprite[chosen_one]->x;
 	alien->bombs[bomb_num]->y = alien->sprite[chosen_one]->y;
-	alien->bombs[bomb_num]->dy = 0.5;
+	alien->bombs[bomb_num]->dy = 0.3;
 
 	alien->last_bomb[chosen_one] = true; //flag the bomb dropper for later
 }
-

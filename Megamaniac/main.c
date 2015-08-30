@@ -6,8 +6,8 @@ int main( void )
 {
 	Game game;
 	Alien alien;
-	
-	srand( get_current_time() );
+
+	srand( time( NULL ) );
 
 	setup_screen();
 	setup_level( &game );
@@ -32,7 +32,7 @@ int main( void )
 			}
 			timer_pause( 5 );
 		}
-		
+
 		if( turn_result == GAME_FINISHED )
 		{
 			break;
