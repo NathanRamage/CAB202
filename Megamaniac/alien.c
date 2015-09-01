@@ -62,17 +62,19 @@ void setup_aliens( Alien * alien )
 		alien->bombs[i]->is_visible = false; //make them invisible
 	}
 
+	int width = screen_width() / 2;
+
 	//set initial positions for the aliens
-	alien->sprite[0] = create_sprite( 3, 1, 1, 1, alien->body );
-	alien->sprite[1] = create_sprite( 9, 1, 1, 1, alien->body );
-	alien->sprite[2] = create_sprite( 15, 1, 1, 1, alien->body );
-	alien->sprite[3] = create_sprite( 0, 3, 1, 1, alien->body );
-	alien->sprite[4] = create_sprite( 6, 3, 1, 1, alien->body );
-	alien->sprite[5] = create_sprite( 12, 3, 1, 1, alien->body );
-	alien->sprite[6] = create_sprite( 18, 3, 1, 1, alien->body );
-	alien->sprite[7] = create_sprite( 3, 5, 1, 1, alien->body );
-	alien->sprite[8] = create_sprite( 9, 5, 1, 1, alien->body );
-	alien->sprite[9] = create_sprite( 15, 5, 1, 1, alien->body );
+	alien->sprite[0] = create_sprite( width - 6, 1, 1, 1, alien->body );
+	alien->sprite[1] = create_sprite( width, 1, 1, 1, alien->body );
+	alien->sprite[2] = create_sprite( width + 6, 1, 1, 1, alien->body );
+	alien->sprite[3] = create_sprite( width - 9, 3, 1, 1, alien->body );
+	alien->sprite[4] = create_sprite( width - 3, 3, 1, 1, alien->body );
+	alien->sprite[5] = create_sprite( width + 3, 3, 1, 1, alien->body );
+	alien->sprite[6] = create_sprite( width + 9, 3, 1, 1, alien->body );
+	alien->sprite[7] = create_sprite( width - 6, 5, 1, 1, alien->body );
+	alien->sprite[8] = create_sprite( width, 5, 1, 1, alien->body );
+	alien->sprite[9] = create_sprite( width + 6, 5, 1, 1, alien->body );
 
 	//set up an order of aliens to loop through for level 4 movement
 	alien->split_aliens[0] = 6;

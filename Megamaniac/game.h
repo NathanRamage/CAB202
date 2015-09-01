@@ -65,6 +65,6 @@ bool resize_detected( void );
 void level3_movement( double * alien_x, double * alien_y, double * dx, double * dy, int width, int height );
 
 /* level 4 movement */
-void level4_movement ( double * alien_x, double * alien_y, double * dx, double * dy, int width, int height, int infront, int middle, int behind, int alien_num );
+void level4_movement ( sprite_id aliens[NUM_ALIENS], double * alien_x, double * alien_y, double * dx, double * dy, int width, int height, int infront, int middle, int behind, int alien_num );
 
 #endif
