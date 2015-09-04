@@ -9,8 +9,8 @@ clean:
 
 rebuild: clean all
 
-SRC=main.c game.c player.c alien.c
+SRC=submission.c game.c player.c alien.c
 HDR=game.h player.h alien.h
 
 Megamaniac: $(SRC) $(HDR) ../ZDK04/libzdk04.a
-	gcc $(FLAGS) $(SRC) -o $@ $(DIRS) $(LIBS) 
+	gcc $(FLAGS) $(SRC) -o $@ $(DIRS) $(LIBS)

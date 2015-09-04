@@ -34,6 +34,10 @@ typedef struct Alien
 	int possible_bombs;
 	int alien_moved;
 	int split_aliens[NUM_ALIENS];
+	timer_id level4_timer;
+	bool expand;
+	timer_id level4_update;
+	bool elite_alien;
 } Alien;
 
 /* defines deault values for alien struct and draws them in their initial positions */

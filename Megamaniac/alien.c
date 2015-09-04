@@ -47,6 +47,11 @@ void setup_aliens( Alien * alien )
 	alien->alien_timer = create_timer( ALIEN_UPDATE_TIME );
 	alien->body = "@";
 	alien->alien_moved = 0;
+	alien->level4_timer = create_timer( 500 );
+	alien->expand = true;
+	alien->level4_update = create_timer( 300 );
+	alien->elite_alien = false;
+
 
 	/* sets all aliens to be alive and sets that none of the have dropped a bomb */
 	for( int i = 0; i < NUM_ALIENS; i++ )

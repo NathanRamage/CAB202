@@ -343,43 +343,6 @@ bool update_sprites( Alien * alien, Game * game )
 						}
 					}
 
-					/* level four movement */
-					else if ( game->level == 4 )
-					{
-						switch ( i )
-						{
-							case 0:
-								level4_movement( alien->sprite, &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height, -5, alien->sprite[0]->x, -5, 1 );
-								break;
-							case 1:
-								level4_movement( alien->sprite, &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height, alien->sprite[2]->x, alien->sprite[1]->x, alien->sprite[0]->x, 2 );
-								break;
-							case 2:
-								level4_movement( alien->sprite, &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height, -5, alien->sprite[2]->x, alien->sprite[1]->x, 3 );
-								break;
-							case 3:
-								level4_movement( alien->sprite, &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height, alien->sprite[4]->x, alien->sprite[3]->x, -5, 4 );
-								break;
-							case 4:
-								level4_movement( alien->sprite, &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height, alien->sprite[5]->x, alien->sprite[4]->x, alien->sprite[3]->x, 5 );
-								break;
-							case 5:
-								level4_movement( alien->sprite, &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height, alien->sprite[6]->x, alien->sprite[5]->x, alien->sprite[4]->x, 6 );
-								break;
-							case 6:
-								level4_movement( alien->sprite, &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height, -5, alien->sprite[6]->x, alien->sprite[5]->x, 7 );
-								break;
-							case 7:
-								level4_movement( alien->sprite, &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height, alien->sprite[8]->x, alien->sprite[7]->x, -5, 8 );
-								break;
-							case 8:
-								level4_movement( alien->sprite, &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height, alien->sprite[9]->x, alien->sprite[8]->x, alien->sprite[7]->x, 9 );
-								break;
-							case 9:
-								level4_movement( alien->sprite, &alien->sprite[i]->x, &alien->sprite[i]->y, &alien->sprite[i]->dx, &alien->sprite[i]->dy, width, height, -5, alien->sprite[9]->x, alien->sprite[8]->x, 10);
-								break;
-						}
-
 						int player_x = (int) round( player->x );
 						int player_y = (int) round( player->y );
 
@@ -390,8 +353,40 @@ bool update_sprites( Alien * alien, Game * game )
 							alien->sprite[i]->is_visible = false;
 						}
 					}
+			}
+		}
 
-					/* level five movement */
+
+		/* level five movement */
+		if ( game->level == 5 )
+		{
+			if ( !alien->elite_alien )
+			{
+				int chosen_one = rand() % 10;
+				alien->sprite[chosen_one]->dx += 1;
+
+				for ( int i = 0; i < NUM_ALIENS; i++ )
+				{
+					alien->sprite[i]->x += alien->sprite[i]->dx;
+					alien->sprite[i]->y += alien->sprite[i]->dy;
+				}
+			}
+		}
+
+		/* level 4 movement */
+		if ( game->level == 4 )
+		{
+			int width = screen_width();
+			int height = screen_height() - 3;
+			level4_movement( alien->sprite, width, height, alien->level4_timer, &alien->expand, alien->level4_update );
+
+			for ( int i = 0; i < NUM_ALIENS; i++ )
+			{
+				int current_y = (int) round( alien->sprite[i]->y );
+
+				if ( current_y >= height )
+				{
+					alien->sprite[i]->y = 0;
 				}
 			}
 		}
@@ -494,164 +489,809 @@ void level3_movement ( double * alien_x, double * alien_y, double * dx, double *
 }
 
 /* level 4 movement */
-void level4_movement ( sprite_id aliens[NUM_ALIENS], double * alien_x, double * alien_y, double * dx, double * dy, int width, int height, int infront, int middle, int behind, int alien_num )
+void level4_movement ( sprite_id aliens[NUM_ALIENS], int width, int height, timer_id level4_timer, bool * expand, timer_id level4_update )
 {
-	if ( alien_num  == 3 || alien_num == 7 || alien_num == 10 )
+	if ( check_level4_timer( level4_timer ) )
 	{
-		bool ok = false;
-
-		while ( !ok )
+		if ( *expand )
 		{
-			int upperBound = width - 1 - middle;
-			int lowerBound = ( middle - behind - 1 );
-			int r = rand() % ( upperBound + lowerBound ) - lowerBound;
+			int upperBound;
+			int lowerBound;
 
-			if ( r == 0 )
-			{
-				*dx = 0;
-			}
-			else if ( middle < width - 10 && middle < width - 30 )
-			{
-				*dx = ( r / 10.0 ) + 3;
-			}
-			else
-			{
-				*dx = ( r / 10.0 );
-			}
+			// start 3 position alien
+			upperBound = ( width - (int) round( aliens[2]->x ) - 1 );
+			lowerBound = ( (int) round( aliens[2]->x - aliens[1]->x ) );
 
-			*alien_x += *dx;
-			*alien_y += *dy;
+			int r = randomNumber( upperBound, lowerBound );
 
-			switch ( alien_num )
+			aliens[2]->dx = ( r / 10.0 ) + 3;
+
+			aliens[2]->x += aliens[2]->dx;
+			aliens[2]->y += aliens[2]->dy;
+
+			int new_x = (int) round( aliens[2]->x );
+			int new_y = (int) round( aliens[2]->y );
+
+			if ( new_x >= width - 1 )
 			{
-				case 3:
-					if ( *alien_x > aliens[1]->x + 1 )
-					{
-						ok = true;
-					}
-					break;
-				case 7:
-					if ( *alien_x > aliens[5]->x + 1 )
-					{
-						ok = true;
-					}
-					break;
-				case 10:
-					if ( *alien_x > aliens[8]->x + 1 )
-					{
-						ok = true;
-					}
-					break;
+				aliens[2]->x = width - 1;
 			}
-
-			int new_y = (int) round( *alien_y );
 
 			if ( new_y >= height )
 			{
-				*alien_y = 0;
-				*alien_x = round( *alien_x );
+				aliens[2]->y = 0;
 			}
+			//end 3 position alien
+
+			//start 7 postion alien
+			upperBound = ( width - (int) round( aliens[6]->x ) - 1 );
+			lowerBound = ( (int) round( aliens[6]->x - aliens[5]->x ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[6]->dx = ( r / 10.0 ) + 3;
+
+			aliens[6]->x += aliens[6]->dx;
+			aliens[6]->y += aliens[6]->dy;
+
+			new_x = (int) round( aliens[6]->x );
+			new_y = (int) round( aliens[6]->y );
+
+			if ( new_x >= width - 1 )
+			{
+				aliens[6]->x = width - 1;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[6]->y = 0;
+			}
+			//end 7 position alien
+
+			//start 10 position alien
+			upperBound = ( width - (int) round( aliens[9]->x ) - 1 );
+			lowerBound = ( (int) round( aliens[9]->x - aliens[8]->x ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[9]->dx = ( r / 10.0 ) + 3;
+
+			aliens[9]->x += aliens[9]->dx;
+			aliens[9]->y += aliens[9]->dy;
+
+			new_x = (int) round( aliens[9]->x );
+			new_y = (int) round( aliens[9]->y );
+
+			if ( new_x >= width - 1 )
+			{
+				aliens[9]->x = width - 1;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[9]->y = 0;
+			}
+			//end 10 position alien
+
+			//start 1 position alien
+			upperBound = ( (int) round( aliens[1]->x - aliens[0]->x - 1 ) );
+			lowerBound = ( (int) round( aliens[0]->x ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[0]->dx = ( r / 10.0 ) - 3;
+
+			aliens[0]->x += aliens[0]->dx;
+			aliens[0]->y += aliens[0]->dy;
+
+			new_x = (int) round( aliens[0]->x );
+			new_y = (int) round( aliens[0]->y );
+
+			if ( new_x <= 0)
+			{
+				aliens[0]->x = 0;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[0]->y = 0;
+			}
+			//end 1 position alien
+
+			//start 4 position alien
+			upperBound = ( (int) round( aliens[4]->x - aliens[3]->x - 1 ) );
+			lowerBound = ( (int) round( aliens[3]->x ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[3]->dx = ( r / 10.0 ) - 3;
+
+			aliens[3]->x += aliens[3]->dx;
+			aliens[3]->y += aliens[3]->dy;
+
+			new_x = (int) round( aliens[3]->x );
+			new_y = (int) round( aliens[3]->y );
+
+			if ( new_x <= 0)
+			{
+				aliens[3]->x = 0;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[3]->y = 0;
+			}
+			//end 4 position alien
+
+			//start 8 position alien
+			upperBound = ( (int) round( aliens[8]->x - aliens[7]->x - 1 ) );
+			lowerBound = ( (int) round( aliens[7]->x ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[7]->dx = ( r / 10.0 ) - 3;
+
+			aliens[7]->x += aliens[7]->dx;
+			aliens[7]->y += aliens[7]->dy;
+
+			new_x = (int) round( aliens[7]->x );
+			new_y = (int) round( aliens[7]->y );
+
+			if ( new_x <= 0)
+			{
+				aliens[7]->x = 0;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[7]->y = 0;
+			}
+			//end 8 position
+
+			//start position 2 alien
+			upperBound = 3;
+			lowerBound = -3;
+
+			r = rand() % 2;
+
+			if ( r == 1 )
+			{
+				aliens[1]->dx = upperBound;
+			}
+			else
+			{
+				aliens[1]->dx = lowerBound;
+			}
+
+			aliens[1]->x += aliens[1]->dx;
+			aliens[1]->y += aliens[1]->dy;
+
+			new_x = (int) round( aliens[1]->x );
+			new_y = (int) round( aliens[1]->y );
+
+			if ( new_x >= (int) round( aliens[2]->x - 2 ) )
+			{
+				aliens[1]->x = aliens[2]->x - 2;
+			}
+			else if ( new_x <= (int) round( aliens[0]->x + 2 ) )
+			{
+				aliens[1]->x = aliens[0]->x + 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[1]->y = 0;
+			}
+			//end position 2 alien
+
+			//start position 9 alien
+			upperBound = 3;
+			lowerBound = -3;
+
+			r = rand() % 2;
+
+			if ( r == 1 )
+			{
+				aliens[8]->dx = upperBound;
+			}
+			else
+			{
+				aliens[8]->dx = lowerBound;
+			}
+
+			aliens[8]->x += aliens[8]->dx;
+			aliens[8]->y += aliens[8]->dy;
+
+			new_x = (int) round( aliens[8]->x );
+			new_y = (int) round( aliens[8]->y );
+
+			if ( new_x >= (int) round( aliens[9]->x - 2 ) )
+			{
+				aliens[8]->x = aliens[9]->x - 2;
+			}
+			else if ( new_x <= (int) round( aliens[7]->x + 2 ) )
+			{
+				aliens[8]->x = aliens[9]->x + 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[8]->y = 0;
+			}
+			//end position 9 alien
+
+			//start 6 postion alien
+			upperBound = ( (int) round( aliens[6]->x - aliens[5]->x - 1 ) );
+			lowerBound = ( (int) round( aliens[5]->x - ( width / 2 ) + 3 ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[5]->dx = ( r / 10.0 ) + 1;
+
+			aliens[5]->x += aliens[5]->dx;
+			aliens[5]->y += aliens[5]->dy;
+
+			new_x = (int) round( aliens[5]->x );
+			new_y = (int) round( aliens[5]->y );
+
+			if ( new_x >= aliens[6]->x - 2 )
+			{
+				aliens[5]->x = aliens[6]->x - 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[5]->y = 0;
+			}
+			//end 6 position alien
+
+			//start 5 position alien
+			upperBound = ( (int) round( ( width / 2 ) - aliens[4]->x - 1 ) );
+			lowerBound = ( (int) round( aliens[4]->x - aliens[3]->x + 1 ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[4]->dx = ( r / 10.0 ) - 1.5;
+
+			aliens[4]->x += aliens[4]->dx;
+			aliens[4]->y += aliens[4]->dy;
+
+			new_x = (int) round( aliens[4]->x );
+			new_y = (int) round( aliens[4]->y );
+
+			if ( new_x <= aliens[3]->x + 2)
+			{
+				aliens[4]->x = aliens[3]->x + 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[4]->y = 0;
+			}
+			//end 5 position alien
+			*expand = false;
 		}
-	}
-	else if ( alien_num == 1 || alien_num == 8 || alien_num == 4 )
-	{
-		bool ok = false;
-
-		while ( ! ok )
+		else
 		{
-			int upperBound = ( infront - behind - 1 );
-			int lowerBound = middle;
-			int r = rand() % ( upperBound + lowerBound ) - lowerBound;
+			int upperBound;
+			int lowerBound;
+			// 3, 7 and 10 position aliens
+			upperBound = ( (int) round( aliens[2]->x ) );
+			lowerBound = ( (int) round( aliens[2]->x - aliens[1]->x + 2 ) );
 
-			if ( middle <= 2 )
-			{
-				*dx = 0;
-			}
-			else if ( middle > 10 && middle < 20 )
-			{
-				*dx = ( r / 10.0 ) - ( r / 3 );
-			}
-			else
-			{
-				*dx = ( r / 10.0 );
-			}
+			int r = randomNumber( upperBound, lowerBound );
 
-			*alien_x += *dx;
-			*alien_y += *dy;
+			aliens[2]->dx = ( r / 10.0 ) - 3;
 
-			switch ( alien_num )
+			aliens[2]->x += aliens[2]->dx;
+			aliens[2]->y += aliens[2]->dy;
+
+			int new_x = (int) round( aliens[2]->x );
+			int new_y = (int) round( aliens[2]->y );
+
+			if ( new_x <= (int) round( aliens[1]->x ) + 2 )
 			{
-				case 1:
-					if ( *alien_x < aliens[1]->x - 1 )
-					{
-						ok = true;
-					}
-					break;
-				case 4:
-					if ( *alien_x < aliens[4]->x - 1 )
-					{
-						ok = true;
-					}
-					break;
-				case 8:
-					if ( *alien_x < aliens[8]->x - 1 )
-					{
-						ok = true;
-					}
-					break;
+				aliens[2]->x = aliens[1]->x + 2;
 			}
-
-			int new_y = (int) round( *alien_y );
 
 			if ( new_y >= height )
 			{
-				*alien_y = 0;
-				*alien_x = round( *alien_x );
+				aliens[2]->y = 0;
 			}
+			//end position 3 alien
+
+			//start position 7 alien
+			upperBound = ( (int) round( aliens[6]->x ) );
+			lowerBound = ( (int) round( aliens[6]->x - aliens[5]->x + 2 ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[6]->dx = ( r / 10.0 ) - 1.5;
+
+			aliens[6]->x += aliens[6]->dx;
+			aliens[6]->y += aliens[6]->dy;
+
+			new_x = (int) round( aliens[6]->x );
+			new_y = (int) round( aliens[6]->y );
+
+			if ( new_x <= (int) round( aliens[5]->x ) + 2 )
+			{
+				aliens[6]->x = aliens[5]->x + 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[6]->y = 0;
+			}
+			//end position 7 alien
+
+			//start position 10 alien
+			upperBound = ( (int) round( aliens[9]->x ) );
+			lowerBound = ( (int) round( aliens[9]->x - aliens[8]->x + 2 ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[9]->dx = ( r / 10.0 ) - 1.5;
+
+			aliens[9]->x += aliens[9]->dx;
+			aliens[9]->y += aliens[9]->dy;
+
+			new_x = (int) round( aliens[9]->x );
+			new_y = (int) round( aliens[9]->y );
+
+			if ( new_x <= (int) round( aliens[8]->x ) + 2 )
+			{
+				aliens[9]->x = aliens[8]->x + 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[9]->y = 0;
+			}
+			//end positoin 10 alien
+
+			//start 1 position alien
+			upperBound = ( (int) round( aliens[1]->x - 2 - aliens[0]->x ) );
+			lowerBound = ( (int) round( aliens[0]->x ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[0]->dx = ( r / 10.0 ) + 3;
+
+			aliens[0]->x += aliens[0]->dx;
+			aliens[0]->y += aliens[0]->dy;
+
+			new_x = (int) round( aliens[0]->x );
+			new_y = (int) round( aliens[0]->y );
+
+			if ( new_x >= (int) round( aliens[1]->x - 2 ) )
+			{
+				aliens[0]->x = aliens[1]->x - 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[0]->y = 0;
+			}
+			//end position 1 alien
+
+			//start position 4 alien
+			upperBound = ( (int) round( aliens[4]->x - 2 - aliens[3]->x ) );
+			lowerBound = ( (int) round( aliens[3]->x ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[3]->dx = ( r / 10.0 ) + 1.5;
+
+			aliens[3]->x += aliens[3]->dx;
+			aliens[3]->y += aliens[3]->dy;
+
+			new_x = (int) round( aliens[3]->x );
+			new_y = (int) round( aliens[3]->y );
+
+			if ( new_x >= (int) round( aliens[4]->x - 2 ) )
+			{
+				aliens[3]->x = aliens[4]->x - 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[3]->y = 0;
+			}
+			//end position 4 alien
+
+			//start position 8 alien
+			upperBound = ( (int) round( aliens[8]->x - 2 - aliens[7]->x ) );
+			lowerBound = ( (int) round( aliens[7]->x ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[7]->dx = ( r / 10.0 ) + 3;
+
+			aliens[7]->x += aliens[7]->dx;
+			aliens[7]->y += aliens[7]->dy;
+
+			new_x = (int) round( aliens[7]->x );
+			new_y = (int) round( aliens[7]->y );
+
+			if ( new_x >= (int) round( aliens[8]->x - 2 ) )
+			{
+				aliens[7]->x = aliens[8]->x - 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[7]->y = 0;
+			}
+			//end position 8 alien
+
+			//start position 2 alien
+			upperBound = -3;
+			lowerBound = 3;
+
+			r = rand() % 2;
+
+			if ( r == 1 )
+			{
+				aliens[1]->dx = upperBound;
+			}
+			else
+			{
+				aliens[1]->dx = lowerBound;
+			}
+
+			aliens[1]->x += aliens[1]->dx;
+			aliens[1]->y += aliens[1]->dy;
+
+			new_x = (int) round( aliens[1]->x );
+			new_y = (int) round( aliens[1]->y );
+
+			if ( new_x >= (int) round( aliens[2]->x - 2 ) )
+			{
+				aliens[1]->x = aliens[2]->x - 2;
+			}
+			else if ( new_x <= (int) round( aliens[0]->x + 2 ) )
+			{
+				aliens[1]->x = aliens[0]->x + 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[1]->y = 0;
+			}
+			//end position 2 alien
+
+			//start position 9 alien
+			upperBound = 3;
+			lowerBound = -3;
+
+			r = rand() % 2;
+
+			if ( r == 1 )
+			{
+				aliens[8]->dx = upperBound;
+			}
+			else
+			{
+				aliens[8]->dx = lowerBound;
+			}
+
+			aliens[8]->x += aliens[8]->dx;
+			aliens[8]->y += aliens[8]->dy;
+
+			new_x = (int) round( aliens[8]->x );
+			new_y = (int) round( aliens[8]->y );
+
+			if ( new_x >= (int) round( aliens[9]->x - 2 ) )
+			{
+				aliens[8]->x = aliens[9]->x - 2;
+			}
+			else if ( new_x <= (int) round( aliens[7]->x + 2 ) )
+			{
+				aliens[8]->x = aliens[7]->x + 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[8]->y = 0;
+			}
+			//end position 9 alien
+
+			//start position 6 alien
+			upperBound = ( (int) round( aliens[6]->x - aliens[5]->x - 1 ) );
+			lowerBound = ( (int) round( aliens[5]->x - ( width / 2 ) + 3 ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[5]->dx = ( r / 10.0 ) - 3;
+
+			aliens[5]->x += aliens[5]->dx;
+			aliens[5]->y += aliens[5]->dy;
+
+			new_x = (int) round( aliens[5]->x );
+			new_y = (int) round( aliens[5]->y );
+
+			if ( new_x <= (int) round( ( width / 2 ) + 3 ) )
+			{
+				aliens[5]->x = ( width / 2 ) + 3;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[5]->y = 0;
+			}
+			//end position 6 alien
+
+			//start position 5 alien
+			upperBound = ( (int) round( ( width / 2 ) - 3 - aliens[4]->x ) );
+			lowerBound = ( (int) round( aliens[4]->x - aliens[3]->x + 1 ) );
+
+			r = randomNumber( upperBound, lowerBound );
+
+			aliens[4]->dx = ( r / 10.0 ) + 3;
+
+			aliens[4]->x += aliens[4]->dx;
+			aliens[4]->y += aliens[4]->dy;
+
+			new_x = (int) round( aliens[4]->x );
+			new_y = (int) round( aliens[4]->y );
+
+			if ( new_x >= (int) round( aliens[5]->x - 2 ) )
+			{
+				aliens[4]->x = aliens[5]->x - 2;
+			}
+
+			if ( new_y >= height )
+			{
+				aliens[4]->y = 0;
+			}//end position 5 alien
+		*expand = true;
 		}
 	}
 	else
 	{
-		bool ok = false;
-
-		while ( !ok )
+		if ( timer_expired( level4_update ) )
 		{
-			int upperBound = ( infront - middle - 1 );
-			int lowerBound = ( middle - behind - 1 );
-			int r = rand() % ( upperBound + lowerBound ) - lowerBound;
-
-			*dx = ( r / 10.0 );
-
-			*alien_x += *dx;
-			*alien_y += *dy;
-
-			switch ( alien_num )
+			for ( int i = 0; i <  NUM_ALIENS; i++ )
 			{
-				case 2:
-					if ( *alien_x < ( aliens[2]->x - 1 ) && ( *alien_x > aliens[0]->x + 1 ) )
+				if ( i == 0)
+				{
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x <= 0 )
 					{
-						ok = true;
+						aliens[i]->x = 0;
 					}
-					break;
-				case 5:
-					if ( *alien_x < ( aliens[5]->x - 1 ) && ( *alien_x > aliens[3]->x + 1 ) )
+					else if ( new_x >= aliens[1]->x - 2)
 					{
-						ok = true;
+						aliens[i]->x = aliens[1]->x - 2;
 					}
-					break;
-				case 6:
-					if ( *alien_x < ( aliens[6]->x - 1 ) && ( *alien_x > aliens[4]->x + 1 ) )
+				}
+				else if ( i == 3)
+				{
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x <= 0 )
 					{
-						ok = true;
+						aliens[i]->x = 0;
 					}
-					break;
-				case 9:
-					if ( *alien_x < ( aliens[9]->x - 1 ) && ( *alien_x > aliens[7]->x + 1 ) )
+					else if ( new_x >= aliens[4]->x - 2)
 					{
-						ok = true;
+						aliens[i]->x = aliens[4]->x - 2;
 					}
-					break;
+				}
+				else if ( i == 4)
+				{
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x <= aliens[3]->x + 2 )
+					{
+						aliens[i]->x = aliens[3]->x + 2;
+					}
+					else if ( new_x >= ( width / 2 ) - 3)
+					{
+						aliens[i]->x = ( width / 2 ) - 3;
+					}
+				}
+				else if ( i == 5)
+				{
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x <= ( width / 2 ) + 3 )
+					{
+						aliens[i]->x = ( width / 2 ) + 3;
+					}
+					else if ( new_x >= aliens[6]->x - 2)
+					{
+						aliens[i]->x = aliens[6]->x - 2;
+					}
+				}
+				else if ( i == 7)
+				{
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x <= 0 )
+					{
+						aliens[i]->x = 0;
+					}
+					else if ( new_x >= aliens[8]->x - 2)
+					{
+						aliens[i]->x = aliens[8]->x - 2;
+					}
+				}
+				else if ( i == 2)
+				{
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x >= width )
+					{
+						aliens[i]->x = width - 1;
+					}
+					else if ( new_x <= aliens[1]->x + 2)
+					{
+						aliens[i]->x = aliens[1]->x + 2;
+					}
+				}
+				else if ( i == 6)
+				{
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x >= width - 1 )
+					{
+						aliens[i]->x = width - 1;
+					}
+					else if ( new_x <= aliens[5]->x + 2)
+					{
+						aliens[i]->x = aliens[5]->x + 2;
+					}
+				}
+				else if ( i == 9)
+				{
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x >= width - 1 )
+					{
+						aliens[i]->x = width - 1;
+					}
+					else if ( new_x <= aliens[8]->x + 2)
+					{
+						aliens[i]->x = aliens[8]->x + 2;
+					}
+				}
+				else if ( i == 6 )
+				{
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x >= width - 1 )
+					{
+						aliens[i]->x = width - 1;
+					}
+					else if ( new_x <= aliens[5]->x + 2)
+					{
+						aliens[i]->x = aliens[5]->x + 2;
+					}
+				}
+				else if ( i == 2 )
+				{
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x >= width - 1 )
+					{
+						aliens[i]->x = width - 1;
+					}
+					else if ( new_x <= aliens[1]->x + 2)
+					{
+						aliens[i]->x = aliens[1]->x + 2;
+					}
+				}
+				else if ( i == 1)
+				{
+					int	r  = rand() % 2;
+
+					if ( r == 1 )
+					{
+						aliens[i]->dx = 3;
+					}
+					else
+					{
+						aliens[i]->dx = -3;
+					}
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x >= (int) round( aliens[2]->x - 2 ) )
+					{
+						aliens[i]->x = aliens[2]->x - 2;
+					}
+					else if ( new_x <= (int) round( aliens[0]->x + 2 ) )
+					{
+						aliens[i]->x = aliens[0]->x + 2;
+					}
+				}
+				else if ( i == 8 )
+				{
+					int	r  = rand() % 2;
+
+					if ( r == 1 )
+					{
+						aliens[i]->dx = 3;
+					}
+					else
+					{
+						aliens[i]->dx = -3;
+					}
+					aliens[i]->x += aliens[i]->dx;
+					aliens[i]->y += aliens[i]->dy;
+
+					int new_x = (int) round( aliens[i]->x );
+
+					if ( new_x >= (int) round( aliens[9]->x - 2 ) )
+					{
+						aliens[i]->x = aliens[9]->x - 2;
+					}
+					else if ( new_x <= (int) round( aliens[7]->x + 2 ) )
+					{
+						aliens[i]->x = aliens[7]->x + 2;
+					}
+				}
+				else
+				{
+					aliens[i]->y += aliens[i]->dy;
+				}
 			}
 		}
 	}
+}
+
+bool check_level4_timer ( timer_id level4_timer )
+{
+	if( timer_expired( level4_timer ))
+	{
+		free ( level4_timer );
+	 	int r = ( rand() % 9 ) + 1;
+		r *= 100;
+		level4_timer = create_timer( r );
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+int randomNumber ( int upperBound, int lowerBound)
+{
+	return ( rand() % ( upperBound + lowerBound ) ) - lowerBound;
 }
